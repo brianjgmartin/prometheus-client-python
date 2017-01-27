@@ -121,13 +121,18 @@ def _parse_sample(text):
                 labelvalue.append('\\' + char)
         elif state == 'nextlabel':
             if char == ',':
-                state = 'labelname'
+                state = 'comma'
             elif char == '}':
                 state = 'endoflabels'
             elif char == ' ' or char == '\t':
                 pass
             else:
                 raise ValueError("Invalid line: " + text)
+        elif state == 'comma':
+            if char == '}':
+              state = 'endoflabels'
+            else:
+              state = 'labelname'
         elif state == 'endoflabels':
             if char == ' ' or char == '\t':
                 pass
@@ -141,7 +146,7 @@ def _parse_sample(text):
             else:
                 value.append(char)
     return (''.join(name), labels, float(''.join(value)))
-    
+
 
 def text_fd_to_metric_families(fd):
     """Parse Prometheus text format from a file descriptor.
